@@ -239,15 +239,16 @@ func PostingsForMatchers(ctx context.Context, ix IndexReader, ms ...*labels.Matc
 			return nil, ctx.Err()
 		}
 		switch {
-		case m.Name == "" && m.Value == "" || m.Type == labels.MatchRegexp && (m.Value == ".*" || m.Value == "^.*$"):
-			// Special-case for AllPostings
-			// .* regexp match all include newlines
+		case m.Name == "" && m.Value == "": // Special-case for AllPostings, used in tests at least.
 			k, v := index.AllPostingsKey()
 			allPostings, err := ix.Postings(ctx, k, v)
 			if err != nil {
 				return nil, err
 			}
 			its = append(its, allPostings)
+		case m.Type == labels.MatchRegexp && (m.Value == ".*" || m.Value == "^.*$"):
+			// .* regexp match all include newlines, do nothing
+			break
 		case m.Type == labels.MatchNotRegexp && (m.Value == ".*" || m.Value == "^.*$"):
 			return index.EmptyPostings(), nil
 		case labelMustBeSet[m.Name]:
