@@ -63,7 +63,8 @@ func NewFastRegexMatcher(v string) (*FastRegexMatcher, error) {
 		// available, even if the string matcher is faster.
 		m.matchString = m.stringMatcher.Matches
 	} else {
-		parsed, err := syntax.Parse(v, syntax.Perl)
+		flags := syntax.ClassNL | syntax.OneLine | syntax.PerlX | syntax.UnicodeGroups | syntax.DotNL
+		parsed, err := syntax.Parse(v, flags)
 		if err != nil {
 			return nil, err
 		}
